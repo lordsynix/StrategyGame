@@ -2,9 +2,12 @@ using UnityEngine;
 
 public class InputManager : MonoBehaviour
 {
-    public string targetTag = "Ground"; // Das Tag des Gameobjects "Ground"
-
-    public GameObject unit;
+    public bool placementMode;
+    public LayerMask groundLayer; // Der Layer des Gameobjects "Ground"
+    
+    public SelectedUnitDictionary selectedUnitDictionary;
+    public UnitManager unitManager;
+    
 
     void Update()
     {
@@ -14,14 +17,27 @@ public class InputManager : MonoBehaviour
             RaycastHit hit;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
-            // Überprüfe, ob der Raycast das Gameobject mit dem Tag "Ground" trifft
-            if (Physics.Raycast(ray, out hit) && hit.collider.CompareTag(targetTag))
+            // Überprüfe, ob der Raycast das Gameobject mit dem Layer "Ground" trifft
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, groundLayer))
             {
                 // Ermittle die Position des Treffers auf dem Gameobject "Ground"
                 Vector3 groundPosition = hit.point;
 
-                // Übergibt die Zielposition an die Unit
-                unit.GetComponent<UnitMovement>().SetTargetPosition(groundPosition);
+                if (!placementMode)
+                {
+                    // Übergibt die Zielposition an die Unit
+                    foreach (var kvp in selectedUnitDictionary.selectedTable)
+                    {
+                        kvp.Value.GetComponent<UnitMovement>().SetTargetPosition(groundPosition);
+                    }
+                }
+                else
+                {
+                    // Erstellt die Start-Unit
+                    unitManager.PlaceStartUnits(groundPosition);
+                    placementMode = false;
+                }
+                
             }
         }
     }

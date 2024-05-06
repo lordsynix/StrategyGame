@@ -17,7 +17,7 @@ public class Selected : MonoBehaviour
     {
         if (GetComponent<Renderer>() != null)
         {
-            GetComponent<Renderer>().material.color = Color.white;
+            GetComponent<Renderer>().material.color = new Color32(0, 82, 3, 255);
         }
     }
 }
